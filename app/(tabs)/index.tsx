@@ -1,98 +1,197 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { useState } from 'react';
+import { Button, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function HomeScreen() {
+  const [userName, setUserName] = useState('');
+  const [userAge, setUserAge] = useState('');
+  const [userCourse, setUserCourse] = useState('');
+  const isStudent = true;
+  const initialHabits = ["Exercise", "Read", "Code"];
+  const user = { name: userName || 'N/A', age: userAge || 'N/A', course: userCourse || 'N/A' };
+  
+  function greetUser(name: string): string {
+    return `Hello, ${name}!`;
+  }
+  const longHabits = initialHabits.filter(habit => habit.length > 5);
+  const numberedHabits = initialHabits.map((habit, index) => `${index + 1}. ${habit}`);
+  
+  const [habits, setHabits] = useState(initialHabits);
+  const [newHabit, setNewHabit] = useState('');
+  const addHabit = () => {
+    if (newHabit.trim()) {
+      setHabits([...habits, newHabit]);
+      setNewHabit('');
+    }
+  };
+  
+  const removeHabit = (index: number) => {
+    const updatedHabits = [...habits];
+    updatedHabits.splice(index, 1);
+    setHabits(updatedHabits);
+  };
+  
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Test</Text>
+      
+      <View style={styles.card}>
+        <Text style={styles.subtitle}>JavaScript Variables Demo:</Text>
+        <Text>Name: {userName || 'Enter name'}</Text>
+        <Text>Age: {userAge || 'Enter age'}</Text>
+        <Text>Course: {userCourse || 'Enter course'}</Text>
+        <Text>Student: {isStudent.toString()}</Text>
+        <Text>Greeting: {greetUser(userName || 'Guest')}</Text>
+        <Text>User Object: {JSON.stringify(user)}</Text>
+        <Text>Long habits (filter): {longHabits.join(', ')}</Text>
+        <Text>Numbered habits (map): {numberedHabits.join(', ')}</Text>
+      </View>
+      
+      <TextInput
+        style={styles.input}
+        value={userName}
+        onChangeText={setUserName}
+        placeholder="Enter your name..."
+      />
+      
+      <TextInput
+        style={styles.input}
+        value={userAge}
+        onChangeText={setUserAge}
+        placeholder="Enter your age..."
+        keyboardType="numeric"
+      />
+      
+      <TextInput
+        style={styles.input}
+        value={userCourse}
+        onChangeText={setUserCourse}
+        placeholder="Enter your course..."
+      />
+      
+      <TextInput
+        style={styles.input}
+        value={newHabit}
+        onChangeText={setNewHabit}
+        placeholder="Enter a new habit..."
+      />
+      
+      <View style={styles.summaryBox}>
+        <Text style={styles.italicText}>
+          {userName || 'Name'}{'\n'}
+          {userAge || 'Age'}{'\n'}
+          {userCourse || 'Course'}{'\n'}
+          Hobbies: {habits.join(', ')}
+        </Text>
+      </View>
+      
+      <Button 
+        title="Add Habit" 
+        onPress={addHabit}
+        color="#007AFF"
+      />
+      
+      <Text style={styles.sectionTitle}>Current Habits ({habits.length} total):</Text>
+      {habits.map((habit, index) => (
+        <View key={index} style={styles.habitItem}>
+          <Text style={styles.habitText}>{index + 1}. {habit}</Text>
+          <Button 
+            title="Remove" 
+            onPress={() => removeHabit(index)}
+            color="#FF3B30"
+          />
+        </View>
+      ))}
+      
+      <Text style={styles.note}>
+        💡 Test this on your phone via Expo Go!
+        Try adding/removing habits.
+      </Text>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: { 
+    flex: 1, 
+    padding: 20, 
+    backgroundColor: '#F5F5F7' 
+  },
+  title: { 
+    fontSize: 28, 
+    fontWeight: 'bold', 
+    marginBottom: 20,
+    color: '#1D1D1F',
+    textAlign: 'center'
+  },
+  card: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#007AFF'
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#C7C7CC',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    fontSize: 16,
+    backgroundColor: 'white'
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginTop: 25,
+    marginBottom: 15,
+    color: '#1D1D1F'
+  },
+  habitItem: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#E5E5EA'
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  habitText: {
+    fontSize: 16,
+    flex: 1
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  note: {
+    marginTop: 30,
+    padding: 15,
+    backgroundColor: '#E8F4FF',
+    borderRadius: 10,
+    color: '#0066CC',
+    fontStyle: 'italic',
+    textAlign: 'center'
   },
+  italicText: {
+    fontStyle: 'italic',
+    marginTop: 15,
+    lineHeight: 24
+  },
+  summaryBox: {
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    marginTop: 15,
+    borderWidth: 1,
+    borderColor: '#E5E5EA'
+  }
 });
